@@ -26,8 +26,16 @@ async function run() {
 
 
     // await client.connect();
+    const kiloByteTech = client
+    .db("KiloByte")
+    .collection("AllBlog");
 
-
+    app.get("/allBlog", async (req, res) => {
+        const cursor = kiloByteTech.find().sort({ postingDate: -1 }).limit(6);
+        const result = await cursor.toArray();
+        res.send(result);
+    });
+  
 
 
     // Send a ping to confirm a successful connection
