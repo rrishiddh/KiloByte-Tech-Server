@@ -30,6 +30,12 @@ async function run() {
     .db("KiloByte")
     .collection("AllBlog");
 
+    app.post("/allBlog", async (req, res) => {
+        const addBlog = req.body;
+        const result = await kiloByteTech.insertOne(addBlog);
+        res.send(result);
+    });
+
     app.get("/allBlog", async (req, res) => {
         const cursor = kiloByteTech.find().sort({ postingDate: -1 }).limit(6);
         const result = await cursor.toArray();
