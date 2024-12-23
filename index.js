@@ -26,6 +26,8 @@ async function run() {
 
     const wishList = client.db("KiloByte").collection("WishList");
 
+    const allComments = client.db("KiloByte").collection("Comments");
+
     app.post("/allBlog", async (req, res) => {
       const addBlog = req.body;
       const result = await kiloByteTech.insertOne(addBlog);
@@ -64,6 +66,28 @@ async function run() {
       const result = await wishList.insertOne(postWish);
       res.send(result);
     });
+
+    app.get("/allBlogPosts", async (req, res) => {
+        const cursor = kiloByteTech.find();
+        const result = await cursor.toArray();
+        res.send(result);
+    });
+    
+    app.post("/comments", async (req, res) => {
+      const comments = req.body;     
+      const result = await allComments.insertOne(comments);
+      res.send(result);
+    });
+    app.get("/comments", async (req, res) => {
+        const blogId = req.query.blogId;
+        let query = {
+          blogId: {
+            $regex: blogId,
+          },
+        };
+        const comments = await allComments.find(query).toArray();
+        res.send(comments);
+      });
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
