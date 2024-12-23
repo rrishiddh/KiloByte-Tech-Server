@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion,ObjectId  } = require("mongodb");
 
 app.use(cors());
 app.use(express.json());
@@ -58,12 +58,12 @@ async function run() {
     });
 
     app.post("/wishList", async (req, res) => {
-      const postWish = req.body;
-      const existingEntry = await wishList.findOne(postWish);
+      const postData = req.body;
+      const existingEntry = await wishList.findOne(postData);
       if (existingEntry) {
         return res.send({ message: "Post is already in WishList" });
       }
-      const result = await wishList.insertOne(postWish);
+      const result = await wishList.insertOne(postData);
       res.send(result);
     });
 
@@ -87,6 +87,24 @@ async function run() {
         };
         const comments = await allComments.find(query).toArray();
         res.send(comments);
+      });
+      
+    app.patch("/allBlog/:id", async (req, res) => {
+        const id = req.params.id;
+        const data = req.body;
+        const query = { _id: new ObjectId(id) };
+        const update = {
+          $set: {
+            title: data?.title,
+            imageUrl: data?.imageUrl,
+            category: data?.category,
+            longDescription: data?.longDescription,
+            shortDescription: data?.shortDescription,
+            postingDate: data?.postingDate,
+          },
+        };
+        const result = await kiloByteTech.updateOne(query, update);
+        res.send(result);
       });
 
     // Send a ping to confirm a successful connection
