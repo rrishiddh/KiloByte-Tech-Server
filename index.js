@@ -108,10 +108,21 @@ async function run() {
     });
 
     app.get("/wishList", async (req, res) => {
-      const cursor = wishList.find().sort({ postingDate: -1 });
-      const result = await cursor.toArray();
-      res.send(result);
-    });
+        const userEmail = req.query.email;
+        if (!userEmail) {
+          return res.status(400).send({ message: "Email is required" });
+        }
+      
+        try {
+          const query = { userEmail: userEmail };
+          const cursor = wishList.find(query).sort({ postingDate: -1 });
+          const result = await cursor.toArray();
+          res.send(result);
+        } catch (error) {
+          res.status(500).send({ message: "Error fetching wishlist", error });
+        }
+      });
+      
 
     app.delete("/wishList/:id", async (req, res) => {
       const id = req.params.id;
