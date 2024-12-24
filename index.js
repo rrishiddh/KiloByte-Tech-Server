@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion,ObjectId  } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 app.use(cors());
 app.use(express.json());
@@ -68,58 +68,72 @@ async function run() {
     });
 
     app.get("/allBlogPosts", async (req, res) => {
-        const cursor = kiloByteTech.find();
-        const result = await cursor.toArray();
-        res.send(result);
+      const cursor = kiloByteTech.find();
+      const result = await cursor.toArray();
+      res.send(result);
     });
-    
+
     app.post("/comments", async (req, res) => {
-      const comments = req.body;     
+      const comments = req.body;
       const result = await allComments.insertOne(comments);
       res.send(result);
     });
     app.get("/comments", async (req, res) => {
-        const blogId = req.query.blogId;
-        let query = {
-          blogId: {
-            $regex: blogId,
-          },
-        };
-        const comments = await allComments.find(query).toArray();
-        res.send(comments);
-      });
-      
+      const blogId = req.query.blogId;
+      let query = {
+        blogId: {
+          $regex: blogId,
+        },
+      };
+      const comments = await allComments.find(query).toArray();
+      res.send(comments);
+    });
+
     app.patch("/allBlog/:id", async (req, res) => {
-        const id = req.params.id;
-        const data = req.body;
-        const query = { _id: new ObjectId(id) };
-        const update = {
-          $set: {
-            title: data?.title,
-            imageUrl: data?.imageUrl,
-            category: data?.category,
-            longDescription: data?.longDescription,
-            shortDescription: data?.shortDescription,
-            postingDate: data?.postingDate,
-          },
-        };
-        const result = await kiloByteTech.updateOne(query, update);
-        res.send(result);
-      });
+      const id = req.params.id;
+      const data = req.body;
+      const query = { _id: new ObjectId(id) };
+      const update = {
+        $set: {
+          title: data?.title,
+          imageUrl: data?.imageUrl,
+          category: data?.category,
+          longDescription: data?.longDescription,
+          shortDescription: data?.shortDescription,
+          postingDate: data?.postingDate,
+        },
+      };
+      const result = await kiloByteTech.updateOne(query, update);
+      res.send(result);
+    });
 
     app.get("/wishList", async (req, res) => {
-        const cursor = wishList.find().sort({ postingDate: -1 });
-        const result = await cursor.toArray();
-        res.send(result);
+      const cursor = wishList.find().sort({ postingDate: -1 });
+      const result = await cursor.toArray();
+      res.send(result);
     });
 
     app.delete("/wishList/:id", async (req, res) => {
-        const id = req.params.id;
-        const query = { _id: new ObjectId(id) };
-        const result = await wishList.deleteOne(query);
-        res.send(result);
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await wishList.deleteOne(query);
+      res.send(result);
     });
-  
+
+    app.get("/featuredBlogPosts", async (req, res) => {
+      try {
+        const blogs = await kiloByteTech.find().toArray();
+        blogs.forEach((blog) => {
+          blog.wordCount = blog.longDescription.split(" ").length;
+        });
+        const topBlogs = blogs
+          .sort((a, b) => b.wordCount - a.wordCount)
+          .slice(0, 10);
+        res.send(topBlogs);
+      } catch (error) {
+        console.error("Error fetching top blogs:", error);
+      }
+    });
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
