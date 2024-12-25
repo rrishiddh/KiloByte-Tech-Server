@@ -1,12 +1,19 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 const app = express();
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-
-app.use(cors());
+const cookieParser = require("cookie-parser");
+const corsOptions = {
+  origin: ["http://localhost:5173"],
+  credentials: true,
+  optionalSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.cfwc1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -18,7 +25,18 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+const verifyToken = (req, res, next) => {
+  const token = req.cookies?.token;
+  if (!token) return res.status(401).send({ message: "Not Authorized" });
 
+  jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ message: "Not Authorized" });
+    }
+    req.user = decoded;
+    next();
+  });
+};
 async function run() {
   try {
     // await client.connect();
@@ -28,7 +46,43 @@ async function run() {
 
     const allComments = client.db("KiloByte").collection("Comments");
 
-    app.post("/allBlog", async (req, res) => {
+    app.post("/jwt", async (req, res) => {
+      const email = req.body;
+      const token = jwt.sign(email, process.env.SECRET_KEY, {
+        expiresIn: "365d",
+      });
+      console.log(token);
+      res
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        })
+        .send({ success: true });
+    });
+
+    app.get("/logout", async (req, res) => {
+      res
+        .clearCookie("token", {
+          maxAge: 0,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        })
+        .send({ success: true });
+    });
+
+    app.post("/allBlog", verifyToken, async (req, res) => {
+      const decodedEmail = req.user?.email;
+
+      const userEmail = req.query.email;
+
+      if (!userEmail) {
+        return res.status(400).send({ message: "Email is required" });
+      }
+      if (decodedEmail !== userEmail) {
+        return res.status(403).send({ message: "Forbidden" });
+      }
+
       const addBlog = req.body;
       const result = await kiloByteTech.insertOne(addBlog);
       res.send(result);
@@ -89,7 +143,17 @@ async function run() {
       res.send(comments);
     });
 
-    app.patch("/allBlog/:id", async (req, res) => {
+    app.patch("/allBlog/:id", verifyToken, async (req, res) => {
+      const decodedEmail = req.user?.email;
+
+      const userEmail = req.query.email;
+
+      if (!userEmail) {
+        return res.status(400).send({ message: "Email is required" });
+      }
+      if (decodedEmail !== userEmail) {
+        return res.status(403).send({ message: "Forbidden" });
+      }
       const id = req.params.id;
       const data = req.body;
       const query = { _id: new ObjectId(id) };
@@ -107,22 +171,27 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/wishList", async (req, res) => {
-        const userEmail = req.query.email;
-        if (!userEmail) {
-          return res.status(400).send({ message: "Email is required" });
-        }
-      
-        try {
-          const query = { userEmail: userEmail };
-          const cursor = wishList.find(query).sort({ postingDate: -1 });
-          const result = await cursor.toArray();
-          res.send(result);
-        } catch (error) {
-          res.status(500).send({ message: "Error fetching wishlist", error });
-        }
-      });
-      
+    app.get("/wishList", verifyToken, async (req, res) => {
+      const decodedEmail = req.user?.email;
+
+      const userEmail = req.query.email;
+
+      if (!userEmail) {
+        return res.status(400).send({ message: "Email is required" });
+      }
+      if (decodedEmail !== userEmail) {
+        return res.status(403).send({ message: "Forbidden" });
+      }
+
+      try {
+        const query = { userEmail: userEmail };
+        const cursor = wishList.find(query).sort({ postingDate: -1 });
+        const result = await cursor.toArray();
+        res.send(result);
+      } catch (error) {
+        res.status(500).send({ message: "Error fetching wishlist", error });
+      }
+    });
 
     app.delete("/wishList/:id", async (req, res) => {
       const id = req.params.id;
