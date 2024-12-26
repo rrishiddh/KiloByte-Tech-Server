@@ -34,8 +34,8 @@
 - Swiper: Swiper is a free and open-source JavaScript library for creating touch-enabled sliders and carousels. It is highly customizable and supports various features like autoplay, loop, and lazy loading.
 
 ##  Live Link: 
-### 1. Netlify : [KiloByte Tech](https://kilobyte-tech-rrishiddh.netlify.app/)
-### 2. Surge : [KiloByte Tech](https://kilobyte-tech-rrishiddh.surge.sh/)
+
+### Surge : [KiloByte Tech](https://kilobyte-tech-rrishiddh.surge.sh/)
 
 ### 
 
