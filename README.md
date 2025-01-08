@@ -33,9 +33,39 @@
 - React-Tabs: React-Tabs is a simple and accessible React component for creating tabbed interfaces. It provides a straightforward API for managing tab selection and content visibility.
 - Swiper: Swiper is a free and open-source JavaScript library for creating touch-enabled sliders and carousels. It is highly customizable and supports various features like autoplay, loop, and lazy loading.
 
-##  Live Link: 
+### Dependencies:
+- cookie-parser: ^1.4.7
+- cors: ^2.8.5
+- dotenv: ^16.4.7
+- express: ^4.21.2
+- jsonwebtoken: ^9.0.2
+- mongodb: ^6.12.0
 
+
+### How to run on local machine?
+1. Open your terminal or command prompt.
+
+2. Use the git clone command followed by the repository URL:-  git clone 'repository-url'
+
+- Replace 'repository-url' with the actual URL of the Git repository you want to clone.
+
+3. To run the project: Navigate to the project directory:- cd 'directory-name' 
+
+4. Run 'npm install' to install project dependencies.
+
+5. Environment setup:Create a '.env' file and put your environment variable there. Save the following variable:
+- DB_USER='YOUR_DB_USER'
+- DB_PASS='YOUR_DB_PASS'
+- JWT_SECRET='YOUR_JWT_SECRET'
+
+6. Run 'npm run dev' to run the project locally.
+
+
+##  Live Link: 
 ### Surge : [KiloByte Tech](https://kilobyte-tech-rrishiddh.surge.sh/)
+
+##  GitHub Repo Link: 
+###  Client Side : [https://github.com/rrishiddh/KiloByte-Tech-Client](https://github.com/rrishiddh/KiloByte-Tech-Client)
 
 ### 
 
