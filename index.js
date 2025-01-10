@@ -107,7 +107,7 @@ async function run() {
     });
 
     app.get("/recentBlog", async (req, res) => {
-      const cursor = kiloByteTech.find().sort({ postingDate: -1 }).limit(6);
+      const cursor = kiloByteTech.find().sort({ postingDate: -1 }).limit(8);
       const result = await cursor.toArray();
       res.send(result);
     });
