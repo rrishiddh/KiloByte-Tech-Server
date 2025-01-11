@@ -63,6 +63,8 @@
 
 ##  Live Link: 
 ### Surge : [KiloByte Tech](https://kilobyte-tech-rrishiddh.surge.sh/)
+### Netlify : [KiloByte Tech](https://kilobyte-tech-rrishiddh.netlify.app/)
+
 
 ##  GitHub Repo Link: 
 ###  Client Side : [https://github.com/rrishiddh/KiloByte-Tech-Client](https://github.com/rrishiddh/KiloByte-Tech-Client)
