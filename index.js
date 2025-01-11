@@ -11,7 +11,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://kilobyte-tech-rrishiddh.surge.sh",
-      "https://kilobyte-tech-rrishiddh.netlify.app"
+      "https://kilobyte-tech-rrishiddh.netlify.app",
     ],
     credentials: true,
   })
